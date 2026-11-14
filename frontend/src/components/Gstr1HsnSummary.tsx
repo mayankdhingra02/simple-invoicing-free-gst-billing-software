@@ -38,7 +38,7 @@ export default function Gstr1HsnSummary({ rows, currency }: {
                   <td>{item.description}</td>
                   <td>{item.uqc}</td>
                   <td className="text-right">{item.gst_rate}%</td>
-                  <td className="text-right">{item.quantity.toFixed(3)}</td>
+                  <td className="text-right">{item.quantity.toFixed(2)}</td>
                   <td className="text-right">{formatCurrency(item.taxable_value, currency)}</td>
                   <td className="text-right">{formatCurrency(item.cgst, currency)}</td>
                   <td className="text-right">{formatCurrency(item.sgst, currency)}</td>

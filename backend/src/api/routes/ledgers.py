@@ -2382,7 +2382,7 @@ def _hsn_section(
                 "num": len(rows) + 1,
                 "uqc": uqc,
                 "rt": rate,
-                "qty": 0.0 if is_service else round(data["qty"], 3) + 0.0,
+                "qty": 0.0 if is_service else _round_amount(data["qty"]),
                 "txval": _round_amount(data["txval"]),
                 "iamt": _round_amount(data["iamt"]),
                 "camt": _round_amount(data["camt"]),

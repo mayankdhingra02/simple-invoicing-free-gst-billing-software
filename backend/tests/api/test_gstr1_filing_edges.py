@@ -574,7 +574,7 @@ def test_hsn_preview_keeps_units_rates_and_buyers_separate(client, seller):
     walk_in = _create_ledger(client, "Walk in")
     business = _ledger_with_gst(client, "Business", MAHARASHTRA_BUYER)
     _sale(client, walk_in, litres, items=[_line(litres, 20, 100, gst_rate=5)])
-    _sale(client, walk_in, kilos, items=[_line(kilos, 3.125, 100, gst_rate=5)])
+    _sale(client, walk_in, kilos, items=[_line(kilos, 3.25, 100, gst_rate=5)])
     _sale(client, walk_in, litres, items=[_line(litres, 2, 100, gst_rate=18)])
     _sale(client, business, litres, items=[_line(litres, 4, 100, gst_rate=5)])
 
@@ -582,7 +582,7 @@ def test_hsn_preview_keeps_units_rates_and_buyers_separate(client, seller):
     assert len(rows) == 4
     assert {(r["category"], r["gst_rate"], r["uqc"], r["quantity"]) for r in rows} == {
         ("B2B", 5, "LTR", 4), ("B2C", 5, "LTR", 20),
-        ("B2C", 5, "KGS", 3.125), ("B2C", 18, "LTR", 2),
+        ("B2C", 5, "KGS", 3.25), ("B2C", 18, "LTR", 2),
     }
 
 
@@ -615,3 +615,16 @@ def test_hsn_preview_service_quantity_matches_export(client, seller):
     _sale(client, buyer, service, items=[_line(service, 2, 100)])
     [row] = _assert_hsn_summary_matches_export(client)
     assert (row["uqc"], row["quantity"]) == ("NA", 0)
+
+
+@pytest.mark.parametrize(("quantity", "expected"), [(3.125, 3.12), (3.126, 3.13), (0.004, 0.0)])
+def test_hsn_preview_and_export_round_stored_quantities_to_two_decimals(client, seller, db_session, quantity, expected):
+    product = _create_product(client, "HSN-Q", "Oil", hsn_sac="1508", unit="Kg", allow_decimal=True)
+    buyer = _create_ledger(client, "Walk in")
+    sold = _sale(client, buyer, product, items=[_line(product, quantity, 100, gst_rate=5)])
+    assert float(db_session.get(InvoiceItem, sold["items"][0]["id"]).quantity) == quantity
+
+    [row] = _assert_hsn_summary_matches_export(client)
+
+    assert (row["uqc"], row["quantity"]) == ("KGS", expected)
+    assert _export(client)["hsn"]["hsn_b2c"][0]["qty"] == expected

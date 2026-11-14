@@ -5,11 +5,11 @@ import Gstr1HsnSummary from './Gstr1HsnSummary';
 
 const litres: Gstr1HsnSummaryItem = {
   hsn_code: '1508', description: 'Oil', uqc: 'LTR', gst_rate: 5,
-  category: 'B2B', quantity: 20.125, taxable_value: 100,
+  category: 'B2B', quantity: 20.25, taxable_value: 100,
   cgst: 2.5, sgst: 2.5, igst: 0, total_tax: 5,
 };
 
-test('shows each buyer, rate and unit row with a three-decimal quantity', () => {
+test('shows each buyer, rate and unit row with a two-decimal quantity', () => {
   const html = renderToStaticMarkup(<Gstr1HsnSummary currency="INR" rows={[
     litres,
     { ...litres, category: 'B2C', uqc: 'KGS', gst_rate: 18, quantity: 3 },
@@ -25,16 +25,16 @@ test('shows each buyer, rate and unit row with a three-decimal quantity', () => 
   expect(html).toContain('<td>KGS</td>');
   expect(html).toContain('>5%</td>');
   expect(html).toContain('>18%</td>');
-  expect(html).toContain('>20.125</td>');
-  expect(html).toContain('>3.000</td>');
+  expect(html).toContain('>20.25</td>');
+  expect(html).toContain('>3.00</td>');
 });
 
 test('labels the combined rows from periods before the B2B/B2C split', () => {
   const html = renderToStaticMarkup(<Gstr1HsnSummary currency="INR" rows={[
-    { ...litres, category: null, quantity: -0.125 },
+    { ...litres, category: null, quantity: -0.25 },
   ]} />);
   expect(html).toContain('<td>All buyers</td>');
-  expect(html).toContain('>-0.125</td>');
+  expect(html).toContain('>-0.25</td>');
 });
 
 test('the empty state spans every column', () => {
